@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>فرم پیگیری ویزا</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>فرم پیگیری ویزا</h2>
+
+    <form id="tracking-form">
+      <label>اسم:</label>
+      <input type="text" id="name" required>
+
+      <label>تخلص:</label>
+      <input type="text" id="lastname" required>
+
+      <label>نمبر پاسپورت:</label>
+      <input type="text" id="passport" required>
+
+      <label>تاریخ تولد:</label>
+      <input type="date" id="birthdate" required>
+
+      <button type="submit">🔍 بررسی</button>
+    </form>
+
+    <div id="loading" style="display:none;">
+      <img src="loading.gif" alt="در حال بررسی...">
+    </div>
+
+    <div id="result" style="display:none;">
+      <p id="letter"></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('tracking-form');
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+    const letter = document.getElementById('letter');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = form.name.value.trim();
+      const lastname = form.lastname.value.trim();
+      const passport = form.passport.value.trim();
+      const birthdate = form.birthdate.value.trim();
+
+      form.style.display = 'none';
+      loading.style.display = 'block';
+      result.style.display = 'none';
+
+      const url = 'YOUR_WEB_APP_URL' +
+        `?name=${encodeURIComponent(name)}` +
+        `&lastname=${encodeURIComponent(lastname)}` +
+        `&passport=${encodeURIComponent(passport)}` +
+        `&birthdate=${encodeURIComponent(birthdate)}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          loading.style.display = 'none';
+          if (data.success) {
+            letter.innerText = data.letter;
+            result.style.display = 'block';
+            setTimeout(resetView, 60000);
+          } else {
+            alert('❌ داده‌ای یافت نشد');
+            resetView();
+          }
+        })
+        .catch(() => {
+          loading.style.display = 'none';
+          alert('خطا در ارتباط با سرور');
+          resetView();
+        });
+    });
+
+    function resetView() {
+      form.reset();
+      form.style.display = 'block';
+      loading.style.display = 'none';
+      result.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
